@@ -1,0 +1,41 @@
+---
+- name: Web_Portal
+  hosts: remote_server_IP
+  become: true 
+  gather_facts: true
+
+  tasks:
+    - name: Install mcutils for vas-portal     ###To install new Portal
+      command: sudo mcutils update vas-portal -v v<version> -dns=true
+
+    - name: Respond with 'Y' to restart prompt
+      expect:
+        command: echo 'Restart services on reboot? (y/N)'
+        responses:
+          'Restart services on reboot? (y/N)': 'Y'
+
+    - name: Change the name
+      expect:
+        command: echo 'If you want to change name? (y/N)'
+        responses:
+          'If you want to change name? (y/N)' : 'N'
+
+    - name: Change the id
+      expect:
+        command: echo 'If you want to change the id? (y/N)'
+        responses:
+          'If you want to change the id? (y/N)': 'N'
+
+    - name: HTTPS connection
+      expect:
+        command: echo 'Do you want to use [HTTPS] secure connection? (y/N)'
+        responses:
+          'Do you want to use [HTTPS] secure connection? (y/N)' : 'Y'
+
+    - name: Go to directory
+      command: ls
+      args:
+        chdir: /opt/megh-vas/portal
+
+    - name: Start Nimble
+      command: docker-compose up -d
